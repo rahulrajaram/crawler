@@ -93,7 +93,7 @@ def store_parsed_text(current_url, parsed_text, parsed_contents_dir):
         file.write(parsed_text)
 
 
-def setup_ssl_certificate():
+def _setup_ssl_certificate():
     try:
         _create_unverified_https_context = ssl._create_unverified_context
     except AttributeError:
@@ -107,7 +107,7 @@ def setup_ssl_certificate():
 def main():
     global _QUEUE
     arguments = parse_arguments()
-    setup_ssl_certificate()
+    _setup_ssl_certificate()
     max_count = arguments.max_count
     _QUEUE.put(arguments.source)
     if not os.path.isdir(_PARSED_CONTENTS_DIR):
