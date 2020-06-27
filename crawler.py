@@ -1,3 +1,4 @@
+import argparse
 from datetime import datetime
 import os
 import queue
@@ -12,6 +13,30 @@ import requests
 _QUEUE = queue.Queue()
 _PARSED_CONTENTS_DIR = "parsed_contents"
 _VISITED_PAGES = set()
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="""Simple tool to scrape the Internet
+    Usage:
+        crawl <options>
+"""
+    )
+    parser.add_argument(
+        '-s',
+        '--source',
+        required=True,
+        help='the web page to start crawling from'
+    )
+    parser.add_argument(
+        '-c',
+        '--max-count',
+        default=1,
+        type=int,
+        help='maximum number of pages to visit before stopping'
+    )
+
+    return parser.parse_args()
 
 
 def crawl(max_count=1, parsed_contents_dir=None):
@@ -81,9 +106,10 @@ def setup_ssl_certificate():
 
 def main():
     global _QUEUE
-    _QUEUE.put("https://www.sprott.com/")
+    arguments = parse_arguments()
     setup_ssl_certificate()
-    max_count = 10
+    max_count = arguments.max_count
+    _QUEUE.put(arguments.source)
     if not os.path.isdir(_PARSED_CONTENTS_DIR):
         os.makedirs(_PARSED_CONTENTS_DIR)
     parsed_contents_dir_for_job = os.path.join(_PARSED_CONTENTS_DIR, _current_utc_timestamp())
